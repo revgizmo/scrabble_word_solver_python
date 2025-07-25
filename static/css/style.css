@@ -1,0 +1,188 @@
+/* Custom styles for Scrabble Word Solver */
+
+body {
+    background-color: #f8f9fa;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.navbar-brand {
+    font-weight: bold;
+    font-size: 1.5rem;
+}
+
+.card {
+    border: none;
+    border-radius: 15px;
+    overflow: hidden;
+}
+
+.card-header {
+    border-bottom: none;
+    padding: 1.5rem;
+}
+
+.card-body {
+    padding: 2rem;
+}
+
+.form-control {
+    border-radius: 10px;
+    border: 2px solid #e9ecef;
+    transition: all 0.3s ease;
+}
+
+.form-control:focus {
+    border-color: #0d6efd;
+    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+}
+
+.btn {
+    border-radius: 10px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.word-item {
+    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+    border: 1px solid #e9ecef;
+    border-radius: 10px;
+    padding: 1rem;
+    margin-bottom: 0.5rem;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.word-item:hover {
+    transform: translateX(5px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    border-color: #0d6efd;
+}
+
+.word-text {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #212529;
+}
+
+.word-score {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #0d6efd;
+}
+
+.word-length {
+    font-size: 0.9rem;
+    color: #6c757d;
+}
+
+.score-badge {
+    background: linear-gradient(135deg, #0d6efd 0%, #0b5ed7 100%);
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-weight: bold;
+    font-size: 1rem;
+}
+
+.high-score {
+    background: linear-gradient(135deg, #198754 0%, #157347 100%);
+    color: white;
+}
+
+.medium-score {
+    background: linear-gradient(135deg, #fd7e14 0%, #e55a00 100%);
+    color: white;
+}
+
+.low-score {
+    background: linear-gradient(135deg, #6c757d 0%, #5a6268 100%);
+    color: white;
+}
+
+.spinner-border {
+    width: 3rem;
+    height: 3rem;
+}
+
+.footer {
+    border-top: 1px solid #e9ecef;
+    margin-top: 3rem;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .card-body {
+        padding: 1.5rem;
+    }
+    
+    .word-item {
+        padding: 0.75rem;
+    }
+    
+    .word-text {
+        font-size: 1.1rem;
+    }
+    
+    .word-score {
+        font-size: 1rem;
+    }
+}
+
+/* Animation for word items */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.word-item {
+    animation: fadeInUp 0.5s ease forwards;
+}
+
+.word-item:nth-child(1) { animation-delay: 0.1s; }
+.word-item:nth-child(2) { animation-delay: 0.2s; }
+.word-item:nth-child(3) { animation-delay: 0.3s; }
+.word-item:nth-child(4) { animation-delay: 0.4s; }
+.word-item:nth-child(5) { animation-delay: 0.5s; }
+.word-item:nth-child(6) { animation-delay: 0.6s; }
+.word-item:nth-child(7) { animation-delay: 0.7s; }
+.word-item:nth-child(8) { animation-delay: 0.8s; }
+.word-item:nth-child(9) { animation-delay: 0.9s; }
+.word-item:nth-child(10) { animation-delay: 1.0s; }
+
+/* Copy button styles */
+.copy-btn {
+    background: none;
+    border: none;
+    color: #6c757d;
+    transition: color 0.3s ease;
+}
+
+.copy-btn:hover {
+    color: #0d6efd;
+}
+
+.copy-btn.copied {
+    color: #198754;
+}
+
+/* Input validation styles */
+.form-control.is-invalid {
+    border-color: #dc3545;
+    box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+}
+
+.form-control.is-valid {
+    border-color: #198754;
+    box-shadow: 0 0 0 0.2rem rgba(25, 135, 84, 0.25);
+} 

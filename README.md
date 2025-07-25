@@ -1,14 +1,17 @@
 # Scrabble Word Solver Python
 
-A Python application that helps Scrabble players find the best possible words from their available letters. The solver generates all valid words from given letters and sorts them by their Scrabble point values.
+A Python web application that helps Scrabble players find the best possible words from their available letters. The solver generates all valid words from given letters and sorts them by their Scrabble point values.
 
 ## Features
 
+- **Web Interface**: Modern, responsive web application built with Flask
 - **Word Generation**: Finds all possible valid words from given letters using permutations
 - **Scoring System**: Calculates Scrabble point values for each word using official letter scores
 - **Dictionary Validation**: Uses a comprehensive dictionary (466,550+ words) to ensure only valid words are returned
 - **Sorted Results**: Returns words sorted by point value (highest scoring first)
-- **Interactive Interface**: Simple command-line interface for easy use
+- **Interactive UI**: Beautiful, modern interface with copy-to-clipboard functionality
+- **API Endpoints**: RESTful API for programmatic access
+- **Mobile Responsive**: Works perfectly on desktop and mobile devices
 
 ## Scrabble Letter Scores
 
@@ -23,6 +26,8 @@ The application uses the official Scrabble letter scoring system:
 
 ## Installation
 
+### Local Development
+
 1. Clone the repository:
 ```bash
 git clone <repository-url>
@@ -34,13 +39,106 @@ cd scrabble_word_solver_python
 python --version
 ```
 
-3. No additional dependencies required - the project uses only Python standard library modules.
+3. Install dependencies:
+```bash
+pip install -r requirements.txt
+```
+
+4. Run the Flask application:
+```bash
+python app.py
+```
+
+5. Open your browser and navigate to `http://localhost:5001`
+
+### Heroku Deployment
+
+The application is configured for easy deployment to Heroku:
+
+1. Install Heroku CLI and login:
+```bash
+# Install Heroku CLI (if not already installed)
+# Visit: https://devcenter.heroku.com/articles/heroku-cli
+
+# Login to Heroku
+heroku login
+```
+
+2. Create a new Heroku app:
+```bash
+heroku create your-scrabble-solver-app-name
+```
+
+3. Deploy to Heroku:
+```bash
+git add .
+git commit -m "Initial Heroku deployment"
+git push heroku main
+```
+
+4. Open your deployed app:
+```bash
+heroku open
+```
 
 ## Usage
 
-### Command Line Interface
+### Web Interface
 
-Run the main application:
+1. Open the web application in your browser
+2. Enter your Scrabble letters in the input field (up to 15 letters)
+3. Click "Find Words" or press Enter
+4. View the results sorted by score (highest first)
+5. Click the copy icon next to any word to copy it to your clipboard
+
+### API Usage
+
+The application provides RESTful API endpoints:
+
+#### Solve Words
+```bash
+POST /solve
+Content-Type: application/json
+
+{
+  "letters": "aetrs"
+}
+```
+
+Response:
+```json
+{
+  "letters": "aetrs",
+  "total_words": 64,
+  "words": [
+    {
+      "word": "aster",
+      "score": 5,
+      "length": 5
+    },
+    ...
+  ]
+}
+```
+
+#### Get Word Score
+```bash
+GET /api/score/aster
+```
+
+Response:
+```json
+{
+  "word": "aster",
+  "score": 5,
+  "length": 5
+}
+```
+
+### Command Line Interface (Legacy)
+
+You can still use the original command-line interface:
+
 ```bash
 python scrabble_solver.py
 ```
@@ -48,24 +146,6 @@ python scrabble_solver.py
 When prompted, enter your Scrabble letters (comma-separated or as a single string):
 ```
 Enter your Scrabble letters (comma-separated): a,e,t,r,s
-```
-
-The application will output all valid words sorted by score:
-```
-Valid Scrabble Words:
-star (4 points)
-rate (4 points)
-tear (4 points)
-ear (3 points)
-ate (3 points)
-tea (3 points)
-art (3 points)
-rat (3 points)
-tar (3 points)
-as (2 points)
-at (2 points)
-ta (2 points)
-a (1 points)
 ```
 
 ### Programmatic Usage
@@ -98,35 +178,26 @@ The tests cover:
 - Valid word generation from letters
 - Result sorting by score
 
-## Development Environment Setup
-
-1. **Python Environment**: The project works with Python 3.6+ and uses only standard library modules.
-
-2. **Virtual Environment** (recommended):
-```bash
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
-```
-
-3. **Code Quality**: Consider using tools like:
-   - `pylint` for code linting
-   - `black` for code formatting
-   - `mypy` for type checking
-
-4. **Running Tests**: The project includes unit tests that can be run with:
-```bash
-python -m unittest test_scrabble_solver.py
-```
-
 ## Project Structure
 
 ```
 scrabble_word_solver_python/
-├── scrabble_solver.py      # Main application logic
+├── app.py                 # Main Flask application
+├── scrabble_solver.py     # Core Scrabble logic
 ├── test_scrabble_solver.py # Unit tests
-├── dictionary.txt          # Word dictionary (466,550+ words)
-├── requirements.txt        # Project dependencies (none external)
-└── README.md              # This file
+├── dictionary.txt         # Word dictionary (466,550+ words)
+├── requirements.txt       # Python dependencies
+├── Procfile              # Heroku deployment configuration
+├── runtime.txt           # Python version for Heroku
+├── templates/
+│   ├── base.html         # Base HTML template
+│   └── index.html        # Main page template
+├── static/
+│   ├── css/
+│   │   └── style.css     # Custom styles
+│   └── js/
+│       └── app.js        # Frontend JavaScript
+└── README.md             # This file
 ```
 
 ## Algorithm
@@ -137,6 +208,30 @@ The word generation algorithm:
 3. Checks each permutation against the dictionary
 4. Calculates Scrabble scores for valid words
 5. Sorts results by score (descending)
+
+## Web App Features
+
+- **Responsive Design**: Works on desktop, tablet, and mobile
+- **Real-time Validation**: Input validation with visual feedback
+- **Loading States**: Visual feedback during word generation
+- **Copy to Clipboard**: One-click copying of words
+- **Score Highlighting**: Color-coded scores (high/medium/low)
+- **Keyboard Shortcuts**: Ctrl+Enter to solve, Escape to clear
+- **Error Handling**: User-friendly error messages
+
+## Deployment
+
+### Heroku Configuration
+
+The application includes all necessary files for Heroku deployment:
+
+- `Procfile`: Tells Heroku to run the Flask app with gunicorn
+- `runtime.txt`: Specifies Python 3.11.7
+- `requirements.txt`: Lists all Python dependencies
+
+### Environment Variables
+
+No environment variables are required for basic functionality. The dictionary file is included in the repository.
 
 ## Contributing
 
