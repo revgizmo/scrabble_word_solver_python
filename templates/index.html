@@ -32,6 +32,94 @@
                             Enter up to 15 letters. You can use spaces, commas, or just type them together.
                         </div>
                     </div>
+
+                    <!-- Advanced Options Section -->
+                    <div class="mb-4">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h5 class="mb-0">
+                                <i class="fas fa-cog"></i> Advanced Options
+                            </h5>
+                            <button type="button" class="btn btn-outline-secondary btn-sm" id="toggle-advanced">
+                                <i class="fas fa-chevron-down"></i> Show Options
+                            </button>
+                        </div>
+                        
+                        <div id="advanced-options" class="d-none">
+                            <div class="row">
+                                <!-- Grouping Options -->
+                                <div class="col-md-6 mb-3">
+                                    <label for="group-by" class="form-label">Group by:</label>
+                                    <select class="form-select" id="group-by">
+                                        <option value="length">By Word Length</option>
+                                        <option value="first_letter">By First Letter</option>
+                                        <option value="last_letter">By Last Letter</option>
+                                    </select>
+                                </div>
+                                
+                                <!-- Sorting Options -->
+                                <div class="col-md-6 mb-3">
+                                    <label for="sort-groups" class="form-label">Sort groups:</label>
+                                    <select class="form-select" id="sort-groups">
+                                        <option value="asc">Ascending</option>
+                                        <option value="desc">Descending</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="col-md-6 mb-3">
+                                    <label for="sort-within-groups" class="form-label">Sort within groups:</label>
+                                    <select class="form-select" id="sort-within-groups">
+                                        <option value="score">By Score</option>
+                                        <option value="alphabetical">Alphabetically</option>
+                                    </select>
+                                </div>
+                                
+                                <!-- View Toggle -->
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">View:</label>
+                                    <div class="btn-group w-100" role="group">
+                                        <input type="radio" class="btn-check" name="view-type" id="view-grouped" value="grouped" checked>
+                                        <label class="btn btn-outline-primary" for="view-grouped">
+                                            <i class="fas fa-layer-group"></i> Grouped
+                                        </label>
+                                        
+                                        <input type="radio" class="btn-check" name="view-type" id="view-flat" value="flat">
+                                        <label class="btn btn-outline-primary" for="view-flat">
+                                            <i class="fas fa-list"></i> Flat
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Filtering Options -->
+                            <div class="row">
+                                <div class="col-12 mb-3">
+                                    <h6 class="mb-2">
+                                        <i class="fas fa-filter"></i> Filters
+                                    </h6>
+                                </div>
+                                
+                                <div class="col-md-3 mb-3">
+                                    <label for="min-length" class="form-label">Min length:</label>
+                                    <input type="number" class="form-control" id="min-length" min="1" max="15" placeholder="1">
+                                </div>
+                                
+                                <div class="col-md-3 mb-3">
+                                    <label for="max-length" class="form-label">Max length:</label>
+                                    <input type="number" class="form-control" id="max-length" min="1" max="15" placeholder="15">
+                                </div>
+                                
+                                <div class="col-md-3 mb-3">
+                                    <label for="starts-with" class="form-label">Starts with:</label>
+                                    <input type="text" class="form-control" id="starts-with" maxlength="1" placeholder="A-Z">
+                                </div>
+                                
+                                <div class="col-md-3 mb-3">
+                                    <label for="ends-with" class="form-label">Ends with:</label>
+                                    <input type="text" class="form-control" id="ends-with" maxlength="1" placeholder="A-Z">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </form>
 
                 <!-- Loading spinner -->
@@ -52,6 +140,25 @@
                         </h4>
                         <div>
                             <span id="word-count" class="badge bg-info"></span>
+                        </div>
+                    </div>
+                    
+                    <!-- Filter summary -->
+                    <div id="filter-summary" class="mb-3 d-none">
+                        <small class="text-muted">
+                            <i class="fas fa-filter"></i> <span id="filter-text"></span>
+                        </small>
+                    </div>
+                    
+                    <!-- View toggle for results -->
+                    <div class="mb-3 d-none" id="results-view-toggle">
+                        <div class="btn-group btn-group-sm" role="group">
+                            <button type="button" class="btn btn-outline-secondary active" id="toggle-grouped-view">
+                                <i class="fas fa-layer-group"></i> Grouped
+                            </button>
+                            <button type="button" class="btn btn-outline-secondary" id="toggle-flat-view">
+                                <i class="fas fa-list"></i> Flat
+                            </button>
                         </div>
                     </div>
                     

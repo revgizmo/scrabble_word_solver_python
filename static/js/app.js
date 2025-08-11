@@ -11,6 +11,29 @@ document.addEventListener('DOMContentLoaded', function() {
     const inputLetters = document.getElementById('input-letters');
     const wordCount = document.getElementById('word-count');
     const errorMessage = document.getElementById('error-message');
+    
+    // Advanced options elements
+    const toggleAdvanced = document.getElementById('toggle-advanced');
+    const advancedOptions = document.getElementById('advanced-options');
+    const groupBy = document.getElementById('group-by');
+    const sortGroups = document.getElementById('sort-groups');
+    const sortWithinGroups = document.getElementById('sort-within-groups');
+    const viewTypeGrouped = document.getElementById('view-grouped');
+    const viewTypeFlat = document.getElementById('view-flat');
+    const minLength = document.getElementById('min-length');
+    const maxLength = document.getElementById('max-length');
+    const startsWith = document.getElementById('starts-with');
+    const endsWith = document.getElementById('ends-with');
+    
+    // Results elements
+    const filterSummary = document.getElementById('filter-summary');
+    const filterText = document.getElementById('filter-text');
+    const resultsViewToggle = document.getElementById('results-view-toggle');
+    const toggleGroupedView = document.getElementById('toggle-grouped-view');
+    const toggleFlatView = document.getElementById('toggle-flat-view');
+    
+    // Store current results data
+    let currentResults = null;
 
     // Form submission handler
     form.addEventListener('submit', function(e) {
@@ -26,9 +49,47 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
+    // Advanced options toggle
+    toggleAdvanced.addEventListener('click', function() {
+        const isVisible = !advancedOptions.classList.contains('d-none');
+        if (isVisible) {
+            advancedOptions.classList.add('d-none');
+            toggleAdvanced.innerHTML = '<i class="fas fa-chevron-down"></i> Show Options';
+        } else {
+            advancedOptions.classList.remove('d-none');
+            toggleAdvanced.innerHTML = '<i class="fas fa-chevron-up"></i> Hide Options';
+        }
+    });
+
+    // Results view toggle handlers
+    toggleGroupedView.addEventListener('click', function() {
+        if (currentResults && currentResults.view_type === 'grouped') {
+            displayGroupedResults(currentResults);
+        }
+        toggleGroupedView.classList.add('active');
+        toggleFlatView.classList.remove('active');
+    });
+
+    toggleFlatView.addEventListener('click', function() {
+        if (currentResults && currentResults.view_type === 'grouped') {
+            displayFlatResults(currentResults);
+        }
+        toggleFlatView.classList.add('active');
+        toggleGroupedView.classList.remove('active');
+    });
+
     // Input validation
     lettersInput.addEventListener('input', function() {
         validateInput();
+    });
+
+    // Filter input validation
+    startsWith.addEventListener('input', function() {
+        this.value = this.value.replace(/[^a-zA-Z]/g, '').toUpperCase();
+    });
+
+    endsWith.addEventListener('input', function() {
+        this.value = this.value.replace(/[^a-zA-Z]/g, '').toUpperCase();
     });
 
     function validateInput() {
@@ -61,12 +122,28 @@ document.addEventListener('DOMContentLoaded', function() {
         hideResults();
 
         try {
+            // Prepare request data
+            const requestData = {
+                letters: letters,
+                group_by: groupBy.value,
+                sort_groups: sortGroups.value,
+                sort_within_groups: sortWithinGroups.value,
+                view_type: viewTypeGrouped.checked ? 'grouped' : 'flat',
+                filters: {}
+            };
+
+            // Add filters if they have values
+            if (minLength.value) requestData.filters.min_length = parseInt(minLength.value);
+            if (maxLength.value) requestData.filters.max_length = parseInt(maxLength.value);
+            if (startsWith.value) requestData.filters.starts_with = startsWith.value.toLowerCase();
+            if (endsWith.value) requestData.filters.ends_with = endsWith.value.toLowerCase();
+
             const response = await fetch('/solve', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ letters: letters })
+                body: JSON.stringify(requestData)
             });
 
             const data = await response.json();
@@ -75,6 +152,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 throw new Error(data.error || 'Failed to solve words');
             }
 
+            currentResults = data;
             displayResults(data);
             
         } catch (err) {
@@ -89,25 +167,148 @@ document.addEventListener('DOMContentLoaded', function() {
         inputLetters.textContent = data.letters.toUpperCase();
         wordCount.textContent = `${data.total_words} word${data.total_words !== 1 ? 's' : ''}`;
 
+        // Show filter summary if filters were applied
+        if (data.filters_applied && data.filters_applied !== 'No filters applied') {
+            filterText.textContent = data.filters_applied;
+            filterSummary.classList.remove('d-none');
+        } else {
+            filterSummary.classList.add('d-none');
+        }
+
+        // Show results view toggle for grouped results
+        if (data.view_type === 'grouped') {
+            resultsViewToggle.classList.remove('d-none');
+        } else {
+            resultsViewToggle.classList.add('d-none');
+        }
+
         // Clear previous results
         wordsContainer.innerHTML = '';
 
-        if (data.words.length === 0) {
+        if (data.total_words === 0) {
             wordsContainer.innerHTML = `
                 <div class="alert alert-info">
                     <i class="fas fa-info-circle"></i>
                     No valid words found with the letters "${data.letters.toUpperCase()}"
                 </div>
             `;
+        } else if (data.view_type === 'grouped') {
+            displayGroupedResults(data);
         } else {
-            // Create word items
+            displayFlatResults(data);
+        }
+
+        showResults();
+    }
+
+    function displayGroupedResults(data) {
+        wordsContainer.innerHTML = '';
+        
+        if (data.grouping && data.grouping.groups) {
+            data.grouping.groups.forEach((group, groupIndex) => {
+                const groupElement = createGroupElement(group, groupIndex);
+                wordsContainer.appendChild(groupElement);
+            });
+        }
+    }
+
+    function displayFlatResults(data) {
+        wordsContainer.innerHTML = '';
+        
+        if (data.words) {
             data.words.forEach((wordData, index) => {
                 const wordItem = createWordItem(wordData, index + 1);
                 wordsContainer.appendChild(wordItem);
             });
         }
+    }
 
-        showResults();
+    function createGroupElement(group, groupIndex) {
+        const groupDiv = document.createElement('div');
+        groupDiv.className = 'group-container mb-4';
+        
+        const groupHeader = createGroupHeader(group, groupIndex);
+        const groupContent = createGroupContent(group);
+        
+        groupDiv.appendChild(groupHeader);
+        groupDiv.appendChild(groupContent);
+        
+        return groupDiv;
+    }
+
+    function createGroupHeader(group, groupIndex) {
+        const headerDiv = document.createElement('div');
+        headerDiv.className = 'group-header d-flex justify-content-between align-items-center';
+        
+        const headerLeft = document.createElement('div');
+        headerLeft.className = 'd-flex align-items-center';
+        
+        const toggleIcon = document.createElement('i');
+        toggleIcon.className = 'fas fa-chevron-down me-2 group-toggle-icon';
+        toggleIcon.style.transition = 'transform 0.3s ease';
+        
+        const groupName = document.createElement('h5');
+        groupName.className = 'mb-0 me-3';
+        groupName.textContent = group.name;
+        
+        const groupStats = document.createElement('span');
+        groupStats.className = 'badge bg-secondary';
+        groupStats.textContent = `${group.count} word${group.count !== 1 ? 's' : ''}, ${group.total_score} pts`;
+        
+        headerLeft.appendChild(toggleIcon);
+        headerLeft.appendChild(groupName);
+        headerLeft.appendChild(groupStats);
+        
+        const headerRight = document.createElement('div');
+        const copyGroupBtn = document.createElement('button');
+        copyGroupBtn.className = 'btn btn-outline-primary btn-sm';
+        copyGroupBtn.innerHTML = '<i class="fas fa-copy"></i> Copy Group';
+        copyGroupBtn.onclick = () => copyGroupToClipboard(group);
+        
+        headerRight.appendChild(copyGroupBtn);
+        
+        headerDiv.appendChild(headerLeft);
+        headerDiv.appendChild(headerRight);
+        
+        // Add click handler for collapse/expand
+        headerDiv.addEventListener('click', function(e) {
+            if (!e.target.closest('.btn')) {
+                toggleGroup(groupIndex);
+            }
+        });
+        
+        return headerDiv;
+    }
+
+    function createGroupContent(group) {
+        const contentDiv = document.createElement('div');
+        contentDiv.className = 'group-content';
+        
+        group.words.forEach((wordData, index) => {
+            const wordItem = createWordItem(wordData, index + 1);
+            contentDiv.appendChild(wordItem);
+        });
+        
+        return contentDiv;
+    }
+
+    function toggleGroup(groupIndex) {
+        const groupContainer = wordsContainer.children[groupIndex];
+        const groupContent = groupContainer.querySelector('.group-content');
+        const toggleIcon = groupContainer.querySelector('.group-toggle-icon');
+        
+        if (groupContent.style.display === 'none') {
+            groupContent.style.display = 'block';
+            toggleIcon.style.transform = 'rotate(0deg)';
+        } else {
+            groupContent.style.display = 'none';
+            toggleIcon.style.transform = 'rotate(-90deg)';
+        }
+    }
+
+    function copyGroupToClipboard(group) {
+        const words = group.words.map(word => word.word).join(', ');
+        copyToClipboard(words);
     }
 
     function createWordItem(wordData, rank) {
